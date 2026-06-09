@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte de Productos en Sala</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  :root {
+    --verde-mercado: #1a7a4a;
+    --verde-claro: #e8f5ee;
+    --verde-medio: #2da05f;
+    --acento: #f59e0b;
+    --acento-claro: #fef3c7;
+    --gris-1: #f8fafc;
+    --gris-2: #e2e8f0;
+    --gris-3: #94a3b8;
+    --gris-4: #475569;
+    --texto: #1e293b;
+    --rojo: #A41E18;
+    --rojo-claro: #fee2e2;
+    --blanco: #ffffff;
+    --azul: #2E446B;
+    --azul-back: #e5f2f6;
+    --sombra: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #ffffffcf;
+    color: var(--texto);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    max-width: 1100px;
+    margin: 0 auto 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: var(--azul);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .header-titles h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--azul);
+    line-height: 1.2;
+  }
+
+  .header-titles p {
+    font-size: 13px; color: var(--gris-3); margin-top: 2px;
+  }
+
+  .header-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .btn-primary {
+    background: var(--azul);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26,122,74,0.25);
+  }
+  .btn-primary:hover { background: #155f3a; transform: translateY(-1px); }
+
+  .btn-acento {
+    background: var(--acento);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+  }
+  .btn-acento:hover { background: #d97706; transform: translateY(-1px); }
+
+  .btn-outline {
+    background: #fff;
+    color: var(--gris-4);
+    border: 1.5px solid var(--gris-2);
+  }
+  .btn-outline:hover { background: var(--gris-1); border-color: var(--gris-3); }
+
+  /* ── CARD PRINCIPAL ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background-color: var(--rojo);
+    padding: 20px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  .card-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px; font-weight: 600;
+    color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .meta-reporte {
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex; flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .meta-item label {
+    font-size: 10px; color: rgba(255,255,255,0.65);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  .meta-item input, .meta-item select {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    padding: 5px 10px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    min-width: 140px;
+  }
+
+  .meta-item input::placeholder { color: rgba(255,255,255,0.5); }
+  .meta-item input:focus { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.2); }
+
+  /* ── FORMULARIO AGREGAR PRODUCTO ── */
+  .add-product-bar {
+    padding: 20px 28px;
+    background: var(--azul-back);
+    border-bottom: 1px solid #c6e6d3;
+  }
+
+  .add-product-bar h3 {
+    font-size: 13px; font-weight: 600; color: var(--azul);
+    margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr 140px 110px 110px 120px auto;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+
+  .field label {
+    font-size: 11px; font-weight: 600; color: var(--gris-4);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .field input, .field select {
+    height: 38px;
+    padding: 0 10px;
+    border: 1.5px solid var(--gris-2);
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--texto);
+    background: #fff;
+    transition: border 0.15s;
+    outline: none;
+    width: 100%;
+  }
+
+  .field input:focus, .field select:focus { border-color: var(--verde-medio); }
+  .field input::placeholder { color: var(--gris-3); }
+
+  /* ── TABLA ── */
+  .table-wrap {
+    overflow-x: auto;
+    padding: 0 0 4px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+  }
+
+  thead tr {
+    background: var(--gris-1);
+    border-bottom: 2px solid var(--gris-2);
+  }
+
+  thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gris-3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--gris-2);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--gris-1); }
+
+  tbody td {
+    padding: 10px 14px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .badge-codigo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 600;
+    background: var(--gris-1);
+    color: var(--gris-4);
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--gris-2);
+    display: inline-block;
+  }
+
+  .badge-marca {
+    font-size: 11px; font-weight: 600;
+    background: var(--acento-claro);
+    color: #92400e;
+    padding: 3px 8px;
+    border-radius: 5px;
+    display: inline-block;
+  }
+
+  .qty-original {
+    font-weight: 700;
+    color: var(--verde-mercado);
+    font-size: 14px;
+  }
+
+  /* Inputs de cantidad en tabla */
+  .qty-input {
+    width: 60px;
+    height: 32px;
+    text-align: center;
+    border: 1.5px solid var(--gris-2);
+    border-radius: 6px;
+    font-size: 13px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    color: var(--texto);
+    background: #fff;
+    outline: none;
+    transition: border 0.15s, background 0.15s;
+  }
+
+  .qty-input:focus { border-color: var(--verde-medio); background: var(--verde-claro); }
+  .qty-input.modified { border-color: var(--acento); background: var(--acento-claro); color: #92400e; }
+
+  .obs-input {
+    width: 100%;
+    min-width: 120px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1.5px solid var(--gris-2);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    outline: none;
+    transition: border 0.15s;
+  }
+  .obs-input:focus { border-color: var(--verde-medio); }
+
+  .fecha-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .fecha-ok { background: #dcfce7; color: #15803d; }
+  .fecha-prox { background: var(--acento-claro); color: #92400e; }
+  .fecha-venc { background: var(--rojo-claro); color: var(--rojo); }
+
+  .btn-eliminar {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    border: none;
+    background: var(--rojo-claro);
+    color: var(--rojo);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .btn-eliminar:hover { background: var(--rojo); color: #fff; }
+
+  /* ── FOOTER TABLA ── */
+  .table-footer {
+    padding: 16px 28px;
+    background: var(--gris-1);
+    border-top: 1px solid var(--gris-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stats {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--verde-mercado);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px; color: var(--gris-3);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    margin-top: 2px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 52px 24px;
+    color: var(--gris-3);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── CONTAINER ── */
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { 
+      background: #fff; 
+      padding: 0; 
+      margin: 0;
+      font-size: 10px; 
+      -webkit-print-color-adjust: exact; 
+      print-color-adjust: exact; 
+    }
+    .no-print, .header-actions, .add-product-bar, .btn-eliminar, .table-footer .btn { 
+      display: none !important; 
+    }
+    .card { 
+      box-shadow: none; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 0; 
+    }
+    .card-header {
+      padding: 12px 16px;
+      background: #fff !important;
+      border-bottom: 2px solid var(--verde-mercado);
+    }
+    .card-header h2 { color: var(--verde-mercado) !important; }
+    .meta-item label { color: var(--gris-4) !important; font-weight: bold; }
+    .meta-item input, .meta-item select { 
+      color: #000 !important; 
+      background: #f8fafc !important; 
+      border: 1px solid #ccc !important; 
+    }
+    .page-header { 
+      max-width: 100%; 
+      margin-bottom: 12px; 
+    }
+    .container { 
+      max-width: 100%; 
+      width: 100%; 
+      padding: 0; 
+      margin: 0; 
+    }
+    .table-wrap { overflow: visible !important; }
+    table { 
+      width: 100% !important; 
+      min-width: 0 !important; 
+      table-layout: fixed !important; 
+    }
+    th { white-space: normal !important; }
+    th, td { 
+      padding: 4px 2px !important; 
+      font-size: 9px !important; 
+      word-wrap: break-word;
+    }
+    
+    th:nth-child(1) { width: 3%; } /* # */
+    th:nth-child(2) { width: 9%; } /* Codigo */
+    th:nth-child(3) { width: 14%; } /* Descripcion */
+    th:nth-child(4) { width: 9%; } /* Marca */
+    th:nth-child(5) { width: 9%; } /* Categoria */
+    th:nth-child(6) { width: 8%; } /* Cant Inicial */
+    th:nth-child(7), th:nth-child(8), th:nth-child(9) { width: 6%; } /* Revs */
+    th:nth-child(10) { width: 18%; } /* Obs */
+    th:nth-child(11) { width: 12%; } /* Fecha */
+
+    .badge-codigo, .badge-marca { 
+      font-size: 9px; 
+      padding: 2px; 
+      white-space: normal;
+    }
+    .qty-original { font-size: 11px; }
+    .qty-input, .obs-input { 
+      border: 1px solid #ccc !important; 
+      height: 24px; 
+      font-size: 9px; 
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box;
+    }
+    @page { 
+      size: landscape; 
+      margin: 10mm; 
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .meta-reporte { width: 100%; justify-content: flex-start; }
+  }
+  @media (max-width: 480px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .meta-reporte { flex-direction: column; gap: 10px; width: 100%; }
+    .meta-item { align-items: flex-start; width: 100%; }
+    .meta-item input, .meta-item select { width: 100%; min-width: 100%; }
+    .stats { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="logo-icon">🛒</div>
+      <div class="header-titles">
+        <h1>Control de Productos en Sala</h1>
+        <p>Registro y seguimiento de inventario en piso</p>
+      </div>
+    </div>
+    <div class="header-actions no-print">
+      <button class="btn btn-outline" onclick="limpiarTodo()">🗑 Limpiar todo</button>
+      <button class="btn btn-acento" onclick="imprimirPDF()">🖨 Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <!-- CARD PRINCIPAL -->
+  <div class="card">
+
+    <!-- Cabecera del reporte -->
+    <div class="card-header">
+      <h2>📋 Reporte de Sala</h2>
+      <div class="meta-reporte">
+        <div class="meta-item">
+          <label>Sección / Área</label>
+          <input type="text" id="seccion" placeholder="Ej: Lácteos, Congelados…">
+        </div>
+        <div class="meta-item">
+          <label>Responsable</label>
+          <input type="text" id="responsable" placeholder="Nombre del operario">
+        </div>
+        <div class="meta-item">
+          <label>Fecha del reporte</label>
+          <input type="date" id="fechaReporte">
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario agregar producto -->
+    <div class="add-product-bar no-print">
+      <h3>➕ Agregar producto</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>Código</label>
+          <input type="text" id="inp-codigo" placeholder="Ej: 7891234">
+        </div>
+        <div class="field">
+          <label>Descripción del producto</label>
+          <input type="text" id="inp-descripcion" placeholder="Ej: Leche entera larga vida 1L">
+        </div>
+        <div class="field">
+          <label>Marca</label>
+          <input type="text" id="inp-marca" placeholder="Ej: Pil Andina">
+        </div>
+        <div class="field">
+          <label>Cant. en sala</label>
+          <input type="number" id="inp-cantidad" placeholder="0" min="0">
+        </div>
+        <div class="field">
+          <label>F. Vencimiento</label>
+          <input type="date" id="inp-fecha">
+        </div>
+        <div class="field">
+          <label>Categoría</label>
+          <select id="inp-categoria">
+            <option value="">— Categoría —</option>
+            <option>Lácteos</option>
+            <option>Carnes</option>
+            <option>Panadería</option>
+            <option>Bebidas</option>
+            <option>Limpieza</option>
+            <option>Congelados</option>
+            <option>Frutas y Verduras</option>
+            <option>Enlatados</option>
+            <option>Snacks</option>
+            <option>Despensa</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="agregarProducto()" style="height:38px;margin-top:0;align-self:end">
+          + Agregar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-wrap">
+      <table id="tabla-productos">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            <th>Cant. Inicial</th>
+            <th>Rev. 1</th>
+            <th>Rev. 2</th>
+            <th>Rev. 3</th>
+            <th>Observaciones</th>
+            <th>F. Vencimiento</th>
+            <th class="no-print">⚙</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <!-- filas dinámicas -->
+        </tbody>
+      </table>
+
+      <div id="empty-state" class="empty-state">
+        <div class="icon">📦</div>
+        <p>Aún no hay productos registrados.<br>Usa el formulario de arriba para agregar el primer artículo.</p>
+      </div>
+    </div>
+
+    <!-- Footer con estadísticas -->
+    <div class="table-footer">
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Productos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-unidades">0</span>
+          <span class="stat-label">Unidades totales</span>
+        </div>
+        <div class="stat" style="color:#ef4444">
+          <span class="stat-num" id="stat-venc" style="color:#ef4444">0</span>
+          <span class="stat-label">Por vencer / vencidos</span>
+        </div>
+      </div>
+      <button class="btn btn-acento no-print" onclick="imprimirPDF()">🖨 Imprimir / Exportar PDF</button>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /container -->
+
+<script>
+  let productos = [];
+  let contador = 0;
+
+  // Fecha de hoy por defecto
+  document.getElementById('fechaReporte').value = new Date().toISOString().split('T')[0];
+
+  function agregarProducto() {
+    const codigo      = document.getElementById('inp-codigo').value.trim();
+    const descripcion = document.getElementById('inp-descripcion').value.trim();
+    const marca       = document.getElementById('inp-marca').value.trim();
+    const cantidad    = document.getElementById('inp-cantidad').value;
+    const fecha       = document.getElementById('inp-fecha').value;
+    const categoria   = document.getElementById('inp-categoria').value;
+
+    if (!codigo || !descripcion || !marca || cantidad === '') {
+      alert('Por favor completa: Código, Descripción, Marca y Cantidad.');
+      return;
+    }
+
+    contador++;
+    const prod = { id: contador, codigo, descripcion, marca, categoria, cantidad: parseInt(cantidad), fecha };
+    productos.push(prod);
+    renderTabla();
+    limpiarForm();
+  }
+
+  function limpiarForm() {
+    ['inp-codigo','inp-descripcion','inp-marca','inp-cantidad','inp-fecha'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('inp-categoria').value = '';
+    document.getElementById('inp-codigo').focus();
+  }
+
+  function renderTabla() {
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty-state');
+
+    if (productos.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      actualizarStats();
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Ordenar productos por fecha de vencimiento (los que no tienen fecha van al final)
+    const sorted = [...productos].sort((a, b) => {
+      if (!a.fecha) return 1;
+      if (!b.fecha) return -1;
+      return new Date(a.fecha) - new Date(b.fecha);
+    });
+
+    // Agrupar por Mes y Año
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const groups = {};
+    
+    sorted.forEach(p => {
+      let groupName = 'Sin Fecha de Vencimiento';
+      if (p.fecha) {
+        const parts = p.fecha.split('-');
+        if (parts.length === 3) {
+            const year = parts[0];
+            const monthIndex = parseInt(parts[1], 10) - 1;
+            groupName = `${meses[monthIndex]} ${year}`;
+        }
+      }
+      if (!groups[groupName]) groups[groupName] = [];
+      groups[groupName].push(p);
+    });
+
+    let html = '';
+    let indexGlobal = 1;
+
+    for (const [groupName, prods] of Object.entries(groups)) {
+      // Cabecera del grupo
+      html += `
+        <tr class="group-header">
+          <td colspan="12" style="background: #e8f5ee !important; color: #1a7a4a !important; font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 10px 14px !important; border-bottom: 2px solid #c6e6d3 !important; border-top: 2px solid #c6e6d3 !important; text-align: left;">
+            🗓 Vencimientos en: ${groupName}
+          </td>
+        </tr>
+      `;
+      // Filas del grupo
+      prods.forEach(p => {
+        const fechaBadge = fechaEstado(p.fecha);
+        html += `
+        <tr id="fila-${p.id}">
+          <td style="color:var(--gris-3);font-weight:600">${indexGlobal++}</td>
+          <td><span class="badge-codigo">${p.codigo}</span></td>
+          <td style="font-weight:500;max-width:200px">${p.descripcion}</td>
+          <td><span class="badge-marca">${p.marca}</span></td>
+          <td style="font-size:12px;color:var(--gris-4)">${p.categoria || '—'}</td>
+          <td class="qty-original">${p.cantidad}</td>
+          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
+          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
+          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
+          <td><input class="obs-input" type="text" placeholder="Agregar nota…"></td>
+          <td>${fechaBadge}</td>
+          <td class="no-print"><button class="btn-eliminar" onclick="eliminarFila(${p.id})" title="Eliminar">✕</button></td>
+        </tr>`;
+      });
+    }
+
+    tbody.innerHTML = html;
+    actualizarStats();
+  }
+
+  function marcarModificado(input) {
+    if (input.value !== '') {
+      input.classList.add('modified');
+    } else {
+      input.classList.remove('modified');
+    }
+  }
+
+  function eliminarFila(id) {
+    if (!confirm('¿Eliminar este producto del reporte?')) return;
+    productos = productos.filter(p => p.id !== id);
+    renderTabla();
+  }
+
+  function limpiarTodo() {
+    if (productos.length === 0) return;
+    if (!confirm('¿Limpiar toda la tabla? Esta acción no se puede deshacer.')) return;
+    productos = [];
+    contador = 0;
+    renderTabla();
+  }
+
+  function actualizarStats() {
+    document.getElementById('stat-total').textContent = productos.length;
+    const unidades = productos.reduce((s, p) => s + p.cantidad, 0);
+    document.getElementById('stat-unidades').textContent = unidades;
+
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const limite = new Date(hoy); limite.setDate(limite.getDate() + 30);
+    const alertas = productos.filter(p => {
+      if (!p.fecha) return false;
+      const f = new Date(p.fecha);
+      return f <= limite;
+    }).length;
+    document.getElementById('stat-venc').textContent = alertas;
+  }
+
+  function fechaEstado(fechaStr) {
+    if (!fechaStr) return '<span style="color:var(--gris-3);font-size:12px">—</span>';
+    const fecha = new Date(fechaStr);
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const limite = new Date(hoy); limite.setDate(limite.getDate() + 30);
+
+    const fmt = fecha.toLocaleDateString('es-BO', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    if (fecha < hoy)        return `<span class="fecha-badge fecha-venc">⚠ Vencido · ${fmt}</span>`;
+    if (fecha <= limite)    return `<span class="fecha-badge fecha-prox">⏳ Próx. · ${fmt}</span>`;
+                            return `<span class="fecha-badge fecha-ok">✓ ${fmt}</span>`;
+  }
+
+  function imprimirPDF() {
+    window.print();
+  }
+
+  // Enter en el formulario agrega producto
+  document.querySelectorAll('.add-product-bar input, .add-product-bar select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') agregarProducto(); });
+  });
+</script>
+</body>
+</html>
