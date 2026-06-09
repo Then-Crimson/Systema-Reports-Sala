@@ -620,8 +620,47 @@
   let productos = [];
   let contador = 0;
 
-  // Fecha de hoy por defecto
-  document.getElementById('fechaReporte').value = new Date().toISOString().split('T')[0];
+  // Cargar datos guardados o usar la fecha de hoy
+  function cargarDatos() {
+    const saved = localStorage.getItem('reporteSalaData');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        productos = data.productos || [];
+        contador = data.contador || 0;
+        if (data.meta) {
+          document.getElementById('seccion').value = data.meta.seccion || '';
+          document.getElementById('responsable').value = data.meta.responsable || '';
+          if (data.meta.fechaReporte) document.getElementById('fechaReporte').value = data.meta.fechaReporte;
+        }
+        renderTabla();
+      } catch (e) {
+        console.error('Error al parsear datos guardados:', e);
+      }
+    }
+    // Si no hay fecha cargada, poner la de hoy
+    if (!document.getElementById('fechaReporte').value) {
+      document.getElementById('fechaReporte').value = new Date().toISOString().split('T')[0];
+    }
+  }
+
+  function guardarDatos() {
+    const data = {
+      productos,
+      contador,
+      meta: {
+        seccion: document.getElementById('seccion').value,
+        responsable: document.getElementById('responsable').value,
+        fechaReporte: document.getElementById('fechaReporte').value
+      }
+    };
+    localStorage.setItem('reporteSalaData', JSON.stringify(data));
+  }
+
+  // Escuchar cambios en los inputs meta para guardar
+  ['seccion', 'responsable', 'fechaReporte'].forEach(id => {
+    document.getElementById(id).addEventListener('input', guardarDatos);
+  });
 
   function agregarProducto() {
     const codigo      = document.getElementById('inp-codigo').value.trim();
@@ -637,8 +676,9 @@
     }
 
     contador++;
-    const prod = { id: contador, codigo, descripcion, marca, categoria, cantidad: parseInt(cantidad), fecha };
+    const prod = { id: contador, codigo, descripcion, marca, categoria, cantidad: parseInt(cantidad), fecha, rev1: '', rev2: '', rev3: '', obs: '' };
     productos.push(prod);
+    guardarDatos();
     renderTabla();
     limpiarForm();
   }
@@ -649,6 +689,14 @@
     });
     document.getElementById('inp-categoria').value = '';
     document.getElementById('inp-codigo').focus();
+  }
+
+  function actualizarDato(id, campo, valor) {
+    const p = productos.find(x => x.id === id);
+    if (p) {
+      p[campo] = valor;
+      guardarDatos();
+    }
   }
 
   function renderTabla() {
@@ -703,6 +751,9 @@
       // Filas del grupo
       prods.forEach(p => {
         const fechaBadge = fechaEstado(p.fecha);
+        const m1 = p.rev1 ? 'modified' : '';
+        const m2 = p.rev2 ? 'modified' : '';
+        const m3 = p.rev3 ? 'modified' : '';
         html += `
         <tr id="fila-${p.id}">
           <td style="color:var(--gris-3);font-weight:600">${indexGlobal++}</td>
@@ -711,10 +762,10 @@
           <td><span class="badge-marca">${p.marca}</span></td>
           <td style="font-size:12px;color:var(--gris-4)">${p.categoria || '—'}</td>
           <td class="qty-original">${p.cantidad}</td>
-          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
-          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
-          <td><input class="qty-input" type="number" min="0" placeholder="—" onchange="marcarModificado(this)"></td>
-          <td><input class="obs-input" type="text" placeholder="Agregar nota…"></td>
+          <td><input class="qty-input ${m1}" type="number" min="0" placeholder="—" value="${p.rev1 || ''}" onchange="actualizarDato(${p.id}, 'rev1', this.value); marcarModificado(this)"></td>
+          <td><input class="qty-input ${m2}" type="number" min="0" placeholder="—" value="${p.rev2 || ''}" onchange="actualizarDato(${p.id}, 'rev2', this.value); marcarModificado(this)"></td>
+          <td><input class="qty-input ${m3}" type="number" min="0" placeholder="—" value="${p.rev3 || ''}" onchange="actualizarDato(${p.id}, 'rev3', this.value); marcarModificado(this)"></td>
+          <td><input class="obs-input" type="text" placeholder="Agregar nota…" value="${p.obs || ''}" onchange="actualizarDato(${p.id}, 'obs', this.value)"></td>
           <td>${fechaBadge}</td>
           <td class="no-print"><button class="btn-eliminar" onclick="eliminarFila(${p.id})" title="Eliminar">✕</button></td>
         </tr>`;
@@ -736,6 +787,7 @@
   function eliminarFila(id) {
     if (!confirm('¿Eliminar este producto del reporte?')) return;
     productos = productos.filter(p => p.id !== id);
+    guardarDatos();
     renderTabla();
   }
 
@@ -744,6 +796,7 @@
     if (!confirm('¿Limpiar toda la tabla? Esta acción no se puede deshacer.')) return;
     productos = [];
     contador = 0;
+    guardarDatos();
     renderTabla();
   }
 
@@ -783,6 +836,9 @@
   document.querySelectorAll('.add-product-bar input, .add-product-bar select').forEach(el => {
     el.addEventListener('keydown', e => { if (e.key === 'Enter') agregarProducto(); });
   });
+
+  // Cargar datos al iniciar la página
+  window.addEventListener('DOMContentLoaded', cargarDatos);
 </script>
 </body>
 </html>
